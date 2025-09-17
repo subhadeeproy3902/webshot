@@ -78,6 +78,7 @@ app.get('/screenshot', async (req, res) => {
       });
 
       args = [
+        ...puppeteer.defaultArgs(), // Use Puppeteer's default args
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
@@ -92,14 +93,14 @@ app.get('/screenshot', async (req, res) => {
       executablePath = await chromium.executablePath(
         `https://github.com/Sparticuz/chromium/releases/download/v138.0.2/chromium-v138.0.2-pack.x64.tar`,
       );
-      args = chromium.args;
+      args = [...puppeteer.defaultArgs(), ...chromium.args];
     }
 
     // Launch Puppeteer browser
     const browser = await puppeteer.launch({
       args: args,
       executablePath: executablePath,
-      headless: 'new',
+      headless: 'shell', // Required for v137+ of @sparticuz/chromium
     });
 
     const page = await browser.newPage();

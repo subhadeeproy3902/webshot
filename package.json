@@ -17,7 +17,7 @@
   "license": "ISC",
   "description": "A Node.js API for capturing website screenshots using Puppeteer",
   "dependencies": {
-    "@sparticuz/chromium-min": "^138.0.2",
+    "@sparticuz/chromium-min": "^133.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "puppeteer-core": "^24.22.0",

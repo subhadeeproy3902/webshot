@@ -78,7 +78,6 @@ app.get('/screenshot', async (req, res) => {
       });
 
       args = [
-        ...puppeteer.defaultArgs(), // Use Puppeteer's default args
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
@@ -91,14 +90,14 @@ app.get('/screenshot', async (req, res) => {
     } else {
       // For production/serverless
       executablePath = await chromium.executablePath();
-      args = [...puppeteer.defaultArgs(), ...chromium.args];
+      args = chromium.args;
     }
 
     // Launch Puppeteer browser
     const browser = await puppeteer.launch({
       args: args,
       executablePath: executablePath,
-      headless: 'shell', // Required for v137+ of @sparticuz/chromium
+      headless: 'new',
     });
 
     const page = await browser.newPage();

@@ -1,10 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "api/screenshot.js": {
-      "runtime": "@vercel/node@3"
-    },
-    "index.js": {
+    "api/*.js": {
       "runtime": "@vercel/node@3"
     }
   },
@@ -16,10 +13,6 @@
     {
       "src": "/",
       "dest": "/api/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.js"
     }
   ]
 }

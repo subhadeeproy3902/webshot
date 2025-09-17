@@ -43,19 +43,43 @@ module.exports = async (req, res) => {
 
     console.log(`Taking screenshot of: ${url}`);
     console.log(`Environment: Vercel Serverless`);
+    console.log(`Node version: ${process.version}`);
+    console.log(`Platform: ${process.platform}`);
 
     // Get Chromium executable path for Vercel
-    const executablePath = await chromium.executablePath();
-    const args = chromium.args;
+    let executablePath;
+    let args;
 
-    console.log(`Chromium executable path: ${executablePath}`);
+    try {
+      executablePath = await chromium.executablePath();
+      args = chromium.args;
+      console.log(`Chromium executable path: ${executablePath}`);
+      console.log(`Chromium args: ${JSON.stringify(args)}`);
+    } catch (chromiumError) {
+      console.error('Failed to get Chromium executable:', chromiumError);
+      return res.status(500).json({
+        error: 'Chromium setup failed',
+        message: chromiumError.message
+      });
+    }
 
     // Launch Puppeteer browser
-    const browser = await puppeteer.launch({
-      args: args,
-      executablePath: executablePath,
-      headless: 'new',
-    });
+    let browser;
+    try {
+      console.log('Launching Puppeteer...');
+      browser = await puppeteer.launch({
+        args: args,
+        executablePath: executablePath,
+        headless: 'new',
+      });
+      console.log('Puppeteer launched successfully');
+    } catch (launchError) {
+      console.error('Failed to launch Puppeteer:', launchError);
+      return res.status(500).json({
+        error: 'Browser launch failed',
+        message: launchError.message
+      });
+    }
 
     const page = await browser.newPage();
 

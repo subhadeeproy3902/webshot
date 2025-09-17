@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
     console.log('Screenshot captured successfully');
 
     // Return the screenshot as binary data
-    return new NextResponse(screenshot, {
+    return new NextResponse(Buffer.from(screenshot), {
       headers: {
         'Content-Type': `image/${format}`,
         'Cache-Control': 'public, max-age=3600',

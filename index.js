@@ -79,6 +79,7 @@ app.get('/screenshot', async (req, res) => {
       });
 
       args = [
+        ...puppeteer.defaultArgs(),
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
@@ -91,7 +92,7 @@ app.get('/screenshot', async (req, res) => {
     } else {
       // For production/serverless
       executablePath = await chromium.executablePath();
-      args = chromium.args;
+      args = [...puppeteer.defaultArgs(), ...chromium.args];
     }
 
     // Launch Puppeteer browser
@@ -101,7 +102,7 @@ app.get('/screenshot', async (req, res) => {
     const browser = await puppeteer.launch({
       args: args,
       executablePath: executablePath,
-      headless: 'new',
+      headless: 'shell', // Required for v137+ of @sparticuz/chromium
     });
 
     console.log('Browser launched successfully');

@@ -1,199 +1,141 @@
-'use client';
-
-import { useState } from 'react';
+import { content } from "@/constant";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 export default function Home() {
-  const [url, setUrl] = useState('https://example.com');
-  const [width, setWidth] = useState(1920);
-  const [height, setHeight] = useState(1080);
-  const [scale, setScale] = useState(1);
-  const [format, setFormat] = useState('png');
-  const [loading, setLoading] = useState(false);
-  const [screenshotUrl, setScreenshotUrl] = useState('');
-  const [error, setError] = useState('');
-
-  const takeScreenshot = async () => {
-    setLoading(true);
-    setError('');
-    setScreenshotUrl('');
-
-    try {
-      const params = new URLSearchParams({
-        url,
-        width: width.toString(),
-        height: height.toString(),
-        scale: scale.toString(),
-        format,
-      });
-
-      const response = await fetch(`/api/screenshot?${params}`);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to take screenshot');
-      }
-
-      // Create blob URL for the image
-      const blob = await response.blob();
-      const imageUrl = URL.createObjectURL(blob);
-      setScreenshotUrl(imageUrl);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Website Screenshot API
-          </h1>
-          <p className="text-gray-600">
-            Take high-quality screenshots of any website
-          </p>
-        </div>
-
-        <div className="bg-white shadow rounded-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Website URL
-              </label>
-              <input
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://example.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Format
-              </label>
-              <select
-                value={format}
-                onChange={(e) => setFormat(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="png">PNG</option>
-                <option value="jpeg">JPEG</option>
-                <option value="webp">WebP</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Width (px)
-              </label>
-              <input
-                type="number"
-                value={width}
-                onChange={(e) => setWidth(parseInt(e.target.value))}
-                min="100"
-                max="4000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Height (px)
-              </label>
-              <input
-                type="number"
-                value={height}
-                onChange={(e) => setHeight(parseInt(e.target.value))}
-                min="100"
-                max="4000"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Device Scale Factor
-              </label>
-              <input
-                type="number"
-                value={scale}
-                onChange={(e) => setScale(parseFloat(e.target.value))}
-                min="0.5"
-                max="3"
-                step="0.1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <button
-              onClick={takeScreenshot}
-              disabled={loading || !url}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <main className="container mx-auto max-w-4xl px-6 py-12">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200/60 overflow-hidden">
+          <div className="px-8 py-12">
+            <Markdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-5xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-3xl font-bold mb-6 mt-12 text-slate-700 border-b-2 border-blue-100 pb-3">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-2xl font-semibold mb-4 mt-8 text-slate-700 flex items-center">
+                    <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full mr-3"></span>
+                    {children}
+                  </h3>
+                ),
+                p: ({ children }) => (
+                  <p className="mb-6 text-slate-600 leading-relaxed text-lg">{children}</p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="mb-6 space-y-3">{children}</ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="mb-6 space-y-3">{children}</ol>
+                ),
+                li: ({ children }) => (
+                  <li className="text-slate-600 flex items-start">
+                    <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mt-3 mr-4 flex-shrink-0"></span>
+                    <span className="leading-relaxed">{children}</span>
+                  </li>
+                ),
+                code: ({ children, className }) => {
+                  const isInline = !className;
+                  if (isInline) {
+                    return (
+                      <code className="bg-gradient-to-r from-blue-50 to-purple-50 px-3 py-1.5 rounded-lg text-sm font-mono text-purple-700 border border-purple-100">
+                        {children}
+                      </code>
+                    );
+                  }
+                  return (
+                    <div className="mb-6 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                      <div className="bg-gradient-to-r from-slate-700 to-slate-800 px-4 py-3 flex items-center">
+                        <div className="flex space-x-2">
+                          <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                          <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                          <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                        </div>
+                      </div>
+                      <pre className="bg-slate-900 text-slate-100 p-6 overflow-x-auto">
+                        <code className="font-mono text-sm leading-relaxed">{children}</code>
+                      </pre>
+                    </div>
+                  );
+                },
+                table: ({ children }) => (
+                  <div className="my-8 overflow-hidden rounded-xl border border-slate-200 shadow-lg bg-white">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-slate-200">
+                        {children}
+                      </table>
+                    </div>
+                  </div>
+                ),
+                thead: ({ children }) => (
+                  <thead className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50">
+                    {children}
+                  </thead>
+                ),
+                tbody: ({ children }) => (
+                  <tbody className="bg-white divide-y divide-slate-100">
+                    {children}
+                  </tbody>
+                ),
+                tr: ({ children }) => (
+                  <tr className="hover:bg-gradient-to-r hover:from-blue-25 hover:to-purple-25 transition-all duration-200">
+                    {children}
+                  </tr>
+                ),
+                th: ({ children }) => (
+                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider border-b-2 border-slate-200">
+                    {children}
+                  </th>
+                ),
+                td: ({ children }) => (
+                  <td className="px-6 py-4 text-sm text-slate-600 whitespace-nowrap border-b border-slate-100">
+                    {children}
+                  </td>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-blue-400 pl-6 py-4 my-6 italic text-slate-600 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-r-lg">
+                    {children}
+                  </blockquote>
+                ),
+                a: ({ children, href }) => (
+                  <a 
+                    href={href} 
+                    className="text-blue-600 hover:text-purple-600 underline decoration-2 underline-offset-2 transition-colors duration-200 font-medium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {children}
+                  </a>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    {children}
+                  </strong>
+                ),
+              }}
             >
-              {loading ? 'Taking Screenshot...' : 'Take Screenshot'}
-            </button>
+              {content}
+            </Markdown>
           </div>
         </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-8">
-            <div className="text-red-800">
-              <strong>Error:</strong> {error}
-            </div>
-          </div>
-        )}
-
-        {screenshotUrl && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Screenshot Result
-            </h2>
-            <div className="border rounded-lg overflow-hidden">
-              <img
-                src={screenshotUrl}
-                alt="Website screenshot"
-                className="w-full h-auto"
-              />
-            </div>
-            <div className="mt-4">
-              <a
-                href={screenshotUrl}
-                download={`screenshot.${format}`}
-                className="inline-block bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-              >
-                Download Screenshot
-              </a>
-            </div>
-          </div>
-        )}
-
-        <div className="mt-8 bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            API Usage
-          </h2>
-          <div className="bg-gray-100 rounded-md p-4">
-            <code className="text-sm">
-              GET /api/screenshot?url={encodeURIComponent(url)}&width={width}&height={height}&scale={scale}&format={format}
-            </code>
-          </div>
-          <div className="mt-4 text-sm text-gray-600">
-            <p><strong>Parameters:</strong></p>
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li><code>url</code> (required): The website URL to screenshot</li>
-              <li><code>width</code> (optional): Viewport width in pixels (default: 1920)</li>
-              <li><code>height</code> (optional): Viewport height in pixels (default: 1080)</li>
-              <li><code>scale</code> (optional): Device scale factor (default: 1)</li>
-              <li><code>format</code> (optional): Image format - png, jpeg, or webp (default: png)</li>
-            </ul>
-          </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl"></div>
+          <div className="absolute top-40 right-10 w-24 h-24 bg-purple-200/20 rounded-full blur-xl"></div>
+          <div className="absolute bottom-20 left-1/4 w-28 h-28 bg-indigo-200/20 rounded-full blur-xl"></div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

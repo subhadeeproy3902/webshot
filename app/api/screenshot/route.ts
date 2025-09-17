@@ -9,10 +9,11 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const url = searchParams.get("url");
-    const width = parseInt(searchParams.get("width") || "1920");
-    const height = parseInt(searchParams.get("height") || "1080");
-    const deviceScaleFactor = parseFloat(searchParams.get("scale") || "1");
-    const format = searchParams.get("format") || "png";
+
+    // Fixed defaults - only URL is required
+    const width = 1920;
+    const height = 1080;
+    const deviceScaleFactor = 1;
 
     // Validate URL
     if (!url) {
@@ -35,41 +36,30 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Validate dimensions
-    if (width < 100 || width > 4000 || height < 100 || height > 4000) {
-      return new NextResponse(
-        JSON.stringify({ error: "Width and height must be between 100 and 4000 pixels" }),
-        { 
-          status: 400,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
 
-    // Validate format
-    if (!["png", "jpeg", "webp"].includes(format)) {
-      return new NextResponse(
-        JSON.stringify({ error: "Format must be png, jpeg, or webp" }),
-        { 
-          status: 400,
-          headers: { "Content-Type": "application/json" }
-        }
-      );
-    }
 
     console.log(`Taking screenshot of: ${url}`);
-    console.log(`Viewport: ${width}x${height}, Scale: ${deviceScaleFactor}, Format: ${format}`);
+    console.log(`Using default viewport: ${width}x${height}`);
 
     // Check if running locally or in production
-    const isLocal = !!process.env.CHROME_EXECUTABLE_PATH;
+    const isLocal = process.env.NODE_ENV === 'development';
     console.log(`Environment: ${isLocal ? 'local' : 'production'}`);
 
     let executablePath: string;
     let args: string[];
 
     if (isLocal) {
-      // For local development
-      executablePath = process.env.CHROME_EXECUTABLE_PATH!;
+      // For local development - try common Chrome paths
+      const possiblePaths = [
+        process.env.CHROME_EXECUTABLE_PATH,
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        '/usr/bin/google-chrome',
+        '/usr/bin/chromium-browser',
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+      ].filter(Boolean);
+
+      executablePath = possiblePaths[0] || 'google-chrome';
       args = [
         ...puppeteer.defaultArgs(),
         '--no-sandbox',
@@ -109,24 +99,23 @@ export async function GET(req: NextRequest) {
     });
 
     // Set user agent to avoid bot detection
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
     // Navigate to the URL with timeout
     await page.goto(url, {
-      waitUntil: 'networkidle0',
-      timeout: 30000,
+      waitUntil: 'domcontentloaded',
+      timeout: 15000,
     });
 
     console.log('Page loaded successfully');
 
     // Wait a bit for any dynamic content to load
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     // Take screenshot
     const screenshot = await page.screenshot({
-      type: format as 'png' | 'jpeg' | 'webp',
+      type: 'png',
       fullPage: false,
-      quality: format === 'jpeg' ? 90 : undefined,
     });
 
     await browser.close();
@@ -135,9 +124,9 @@ export async function GET(req: NextRequest) {
     // Return the screenshot as binary data
     return new NextResponse(Buffer.from(screenshot), {
       headers: {
-        'Content-Type': `image/${format}`,
+        'Content-Type': 'image/png',
         'Cache-Control': 'public, max-age=3600',
-        'Content-Disposition': `inline; filename="screenshot.${format}"`,
+        'Content-Disposition': 'inline; filename="screenshot.png"',
       },
     });
 

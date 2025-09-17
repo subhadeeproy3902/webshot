@@ -1,3 +1,4 @@
+export const content = `
 # Website Screenshot API
 
 A powerful Next.js API for capturing high-quality screenshots of websites using Puppeteer and Chromium. Built for serverless deployment on Vercel.
@@ -17,23 +18,23 @@ A powerful Next.js API for capturing high-quality screenshots of websites using 
 
 ### Endpoint
 
-```
+\`\`\`
 GET /api/screenshot
-```
+\`\`\`
 
 ### Parameters
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `url` | string | ✅ Yes | - | The website URL to screenshot |
-| `width` | number | ❌ No | 1920 | Viewport width in pixels (100-4000) |
-| `height` | number | ❌ No | 1080 | Viewport height in pixels (100-4000) |
-| `scale` | number | ❌ No | 1 | Device scale factor (0.5-3.0) |
-| `format` | string | ❌ No | png | Image format (png, jpeg, webp) |
+| \`url\` | string | ✅ Yes | - | The website URL to screenshot |
+| \`width\` | number | ❌ No | 1920 | Viewport width in pixels (100-4000) |
+| \`height\` | number | ❌ No | 1080 | Viewport height in pixels (100-4000) |
+| \`scale\` | number | ❌ No | 1 | Device scale factor (0.5-3.0) |
+| \`format\` | string | ❌ No | png | Image format (png, jpeg, webp) |
 
 ### Example Requests
 
-```bash
+\`\`\`bash
 # Basic screenshot
 curl "https://your-domain.vercel.app/api/screenshot?url=https://example.com"
 
@@ -42,19 +43,19 @@ curl "https://your-domain.vercel.app/api/screenshot?url=https://example.com&widt
 
 # High DPI screenshot
 curl "https://your-domain.vercel.app/api/screenshot?url=https://example.com&scale=2"
-```
+\`\`\`
 
 ### Response
 
 - **Success**: Returns the screenshot image as binary data
 - **Error**: Returns JSON with error details
 
-```json
+\`\`\`json
 {
   "error": "Invalid URL provided",
   "message": "Failed to capture screenshot"
 }
-```
+\`\`\`
 
 ## Getting Started
 
@@ -66,45 +67,45 @@ curl "https://your-domain.vercel.app/api/screenshot?url=https://example.com&scal
 ### Installation
 
 1. Clone the repository:
-```bash
+\`\`\`bash
 git clone https://github.com/your-username/webshot.git
 cd webshot
-```
+\`\`\`
 
 2. Install dependencies:
-```bash
+\`\`\`bash
 npm install
 # or
 yarn install
 # or
 bun install
-```
+\`\`\`
 
 3. Run the development server:
-```bash
+\`\`\`bash
 npm run dev
 # or
 yarn dev
 # or
 bun dev
-```
+\`\`\`
 
 4. Open [http://localhost:3000](http://localhost:3000) to see the web interface.
 
 ### Local Development
 
-For local development, you can set the `CHROME_EXECUTABLE_PATH` environment variable to use your local Chrome installation:
+For local development, you can set the \`CHROME_EXECUTABLE_PATH\` environment variable to use your local Chrome installation:
 
-```bash
+\`\`\`bash
 # Windows
-set CHROME_EXECUTABLE_PATH="C:\Program Files\Google\Chrome\Application\chrome.exe"
+set CHROME_EXECUTABLE_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 
 # macOS
 export CHROME_EXECUTABLE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
 # Linux
 export CHROME_EXECUTABLE_PATH="/usr/bin/google-chrome"
-```
+\`\`\`
 
 ## Deployment
 
@@ -138,3 +139,4 @@ No environment variables are required for production deployment on Vercel.
 3. Make your changes
 4. Test locally
 5. Submit a pull request
+`;

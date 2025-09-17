@@ -9,6 +9,7 @@ export async function renderScreenshotWithPuppeteer(url: string) {
 
   const browser = await puppeteer.launch({
     defaultViewport: viewport,
+    headless: true,
   });
 
   const page = await browser.newPage();

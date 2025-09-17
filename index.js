@@ -52,8 +52,9 @@ app.get('/screenshot', async (req, res) => {
 
     console.log(`Taking screenshot of: ${url}`);
 
-    // Check if running locally or in production
-    const isLocal = process.platform === 'win32' || process.platform === 'darwin' || process.platform === 'linux';
+    // Check if running locally or in production (Vercel sets VERCEL env var)
+    const isLocal = !process.env.VERCEL;
+    console.log(`Environment: ${process.platform}, isLocal: ${isLocal}`);
 
     let executablePath;
     let args;
@@ -94,11 +95,16 @@ app.get('/screenshot', async (req, res) => {
     }
 
     // Launch Puppeteer browser
+    console.log(`Launching browser with executablePath: ${executablePath}`);
+    console.log(`Browser args: ${JSON.stringify(args)}`);
+
     const browser = await puppeteer.launch({
       args: args,
       executablePath: executablePath,
       headless: 'new',
     });
+
+    console.log('Browser launched successfully');
 
     const page = await browser.newPage();
 

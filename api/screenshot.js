@@ -2,6 +2,9 @@ const puppeteer = require('puppeteer-core');
 const chromium = require('@sparticuz/chromium-min');
 const validator = require('validator');
 
+// Set Chromium to use minimal graphics mode for better compatibility
+chromium.setGraphicsMode = false;
+
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -51,7 +54,10 @@ module.exports = async (req, res) => {
     let args;
 
     try {
-      executablePath = await chromium.executablePath();
+      // Use specific Chromium version for better compatibility
+      executablePath = await chromium.executablePath(
+        'https://github.com/Sparticuz/chromium/releases/download/v130.0.0/chromium-v130.0.0-pack.tar'
+      );
       args = chromium.args;
       console.log(`Chromium executable path: ${executablePath}`);
       console.log(`Chromium args: ${JSON.stringify(args)}`);
@@ -68,9 +74,18 @@ module.exports = async (req, res) => {
     try {
       console.log('Launching Puppeteer...');
       browser = await puppeteer.launch({
-        args: args,
+        args: [
+          ...args,
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor',
+          '--disable-background-timer-throttling',
+          '--disable-backgrounding-occluded-windows',
+          '--disable-renderer-backgrounding'
+        ],
         executablePath: executablePath,
         headless: 'new',
+        ignoreHTTPSErrors: true,
+        defaultViewport: null,
       });
       console.log('Puppeteer launched successfully');
     } catch (launchError) {

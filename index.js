@@ -90,7 +90,7 @@ app.get('/screenshot', async (req, res) => {
     } else {
       // For production/serverless
       executablePath = await chromium.executablePath(
-        `https://github.com/Sparticuz/chromium/releases/download/v130.0.0/chromium-v130.0.0-pack.tar`,
+        `https://github.com/Sparticuz/chromium/releases/download/v138.0.2/chromium-v138.0.2-pack.x64.tar`,
       );
       args = chromium.args;
     }

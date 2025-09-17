@@ -1,53 +1,77 @@
-import { renderScreenshotWithPuppeteer } from "@/lib/puppeteer";
-import { unstable_noStore } from "next/cache";
-import validator from "validator";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const urlParam = searchParams.get("url");
+  if (!urlParam) {
+    return new NextResponse("Please provide a URL.", { status: 400 });
+  }
+
+  // Prepend http:// if missing
+  let inputUrl = urlParam.trim();
+  if (!/^https?:\/\//i.test(inputUrl)) {
+    inputUrl = `http://${inputUrl}`;
+  }
+
+  // Validate the URL is a valid HTTP/HTTPS URL
+  let parsedUrl: URL;
   try {
-    unstable_noStore();
-    const { searchParams } = new URL(req.url);
-    const url = searchParams.get("url");
+    parsedUrl = new URL(inputUrl);
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      return new NextResponse("URL must start with http:// or https://", {
+        status: 400,
+      });
+    }
+  } catch {
+    return new NextResponse("Invalid URL provided.", { status: 400 });
+  }
 
-    // Validate URL
-    if (!url) {
-      return new Response(
-        JSON.stringify({ error: "URL parameter is required" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+  let browser;
+  try {
+    const isVercel = !!process.env.VERCEL_ENV;
+    const viewport = {
+      width: 1920,
+      height: 1080,
+      deviceScaleFactor: 1,
+    };
+    let puppeteer: any,
+      launchOptions: any = {
+        headless: true,
+        defaultViewport: viewport,
+      };
+
+    if (isVercel) {
+      const chromium = (await import("@sparticuz/chromium")).default;
+      puppeteer = await import("puppeteer-core");
+      launchOptions = {
+        ...launchOptions,
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+      };
+    } else {
+      puppeteer = await import("puppeteer");
     }
 
-    if (!validator.isURL(url)) {
-      return new Response(
-        JSON.stringify({ error: "Invalid URL provided" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
-    const screenshot = await renderScreenshotWithPuppeteer(
-      url
-    );
-
-     return new Response(Buffer.from(screenshot), {
-        headers: { "content-type": "image/jpeg" },
+    browser = await puppeteer.launch(launchOptions);
+    const page = await browser.newPage();
+    await page.goto(parsedUrl.toString(), { waitUntil: "networkidle2" });
+    const screenshot = await page.screenshot({ type: "png" });
+    return new NextResponse(screenshot, {
+      headers: {
+        "Content-Type": "image/png",
+        "Content-Disposition": 'inline; filename="screenshot.png"',
+      },
     });
-    
   } catch (error) {
-    console.error("Screenshot error:", error);
-    return new Response(
-      JSON.stringify({
-        error: "Internal server error",
-        message: "Failed to capture screenshot",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+    console.error(error);
+    return new NextResponse(
+      "An error occurred while generating the screenshot.",
+      { status: 500 }
     );
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }

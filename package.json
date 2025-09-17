@@ -1,29 +1,30 @@
 {
-  "name": "webshot",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "sef",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js",
-    "build": "echo 'No build step required'"
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
   },
-  "keywords": [
-    "screenshot",
-    "puppeteer",
-    "express",
-    "api"
-  ],
-  "author": "",
-  "license": "ISC",
-  "description": "A Node.js API for capturing website screenshots using Puppeteer",
   "dependencies": {
     "@sparticuz/chromium-min": "^138.0.2",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
+    "next": "15.5.3",
     "puppeteer-core": "^24.22.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "validator": "^13.15.15"
   },
-  "engines": {
-    "node": ">=22.0.0"
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

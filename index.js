@@ -90,9 +90,7 @@ app.get('/screenshot', async (req, res) => {
       ];
     } else {
       // For production/serverless
-      executablePath = await chromium.executablePath(
-        `https://github.com/Sparticuz/chromium/releases/download/v138.0.2/chromium-v138.0.2-pack.x64.tar`,
-      );
+      executablePath = await chromium.executablePath();
       args = [...puppeteer.defaultArgs(), ...chromium.args];
     }
 

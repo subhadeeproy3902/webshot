@@ -2,9 +2,18 @@ const express = require('express');
 const puppeteer = require('puppeteer-core');
 const chromium = require('@sparticuz/chromium-min');
 const validator = require('validator');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// CORS configuration - allow all origins including Vercel domains
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 // Middleware for JSON parsing
 app.use(express.json());
@@ -95,11 +104,11 @@ app.get('/screenshot', async (req, res) => {
 
     const page = await browser.newPage();
 
-    // Set viewport to 16:9 ratio (1920x1080 for high quality)
+    // Set viewport to exactly 1920x1080 (16:9 ratio)
     await page.setViewport({
       width: 1920,
       height: 1080,
-      deviceScaleFactor: 1.4
+      deviceScaleFactor: 1
     });
 
     // Set user agent to avoid bot detection

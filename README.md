@@ -103,7 +103,8 @@ wget "http://localhost:3000/screenshot?url=https://www.example.com" -O example.p
 ### Screenshot Settings
 
 The service captures screenshots with the following settings:
-- **Resolution:** 1920x1080 (16:9 aspect ratio)
+- **Resolution:** Exactly 1920x1080 (16:9 aspect ratio)
+- **Device Scale Factor:** 1.0 (no scaling for true browser resolution)
 - **Format:** PNG
 - **Viewport Only:** Does not capture full page, only visible area
 - **Timeout:** 30 seconds for page loading
@@ -184,12 +185,40 @@ All errors return appropriate HTTP status codes and JSON error messages.
 - No file system access beyond screenshot generation
 - Timeout protection against hanging requests
 
+## Deployment
+
+### Vercel Deployment
+
+This project is optimized for Vercel deployment with full CORS support:
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy to Vercel
+vercel
+
+# Deploy to production
+vercel --prod
+```
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+
+### CORS Support
+
+The API includes comprehensive CORS support for:
+- All origins (including Vercel domains)
+- All common HTTP methods
+- Proper preflight handling
+- Custom headers support
+
 ## Dependencies
 
 - **express**: Web framework for the REST API
 - **puppeteer-core**: Headless Chrome automation (core library)
 - **@sparticuz/chromium-min**: Optimized Chromium binary for serverless environments
 - **validator**: URL validation utilities
+- **cors**: Cross-Origin Resource Sharing middleware
 
 ## License
 

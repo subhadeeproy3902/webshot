@@ -5,112 +5,99 @@ import rehypeRaw from "rehype-raw";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <main className="container mx-auto max-w-4xl px-6 py-12">
-        <div className="bg-white rounded-2xl shadow-xl border border-slate-200/60 overflow-hidden">
-          <div className="px-8 py-12">
+    <div className="min-h-screen bg-gray-50">
+      <main className="container mx-auto max-w-4xl px-6 py-16">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="px-12 py-16">
             <Markdown
               remarkPlugins={[remarkGfm]}
               rehypePlugins={[rehypeRaw]}
               components={{
                 h1: ({ children }) => (
-                  <h1 className="text-5xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
+                  <h1 className="text-4xl font-bold mb-8 text-blue-600 leading-tight">
                     {children}
                   </h1>
                 ),
                 h2: ({ children }) => (
-                  <h2 className="text-3xl font-bold mb-6 mt-12 text-slate-700 border-b-2 border-blue-100 pb-3">
+                  <h2 className="text-2xl font-semibold mb-6 mt-12 text-gray-900 border-b border-blue-100 pb-3">
                     {children}
                   </h2>
                 ),
                 h3: ({ children }) => (
-                  <h3 className="text-2xl font-semibold mb-4 mt-8 text-slate-700 flex items-center">
-                    <span className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full mr-3"></span>
+                  <h3 className="text-xl font-semibold mb-4 mt-8 text-gray-800">
                     {children}
                   </h3>
                 ),
                 p: ({ children }) => (
-                  <p className="mb-6 text-slate-600 leading-relaxed text-lg">{children}</p>
+                  <p className="mb-6 text-gray-700 leading-relaxed">{children}</p>
                 ),
                 ul: ({ children }) => (
-                  <ul className="mb-6 space-y-3">{children}</ul>
+                  <ul className="mb-6 space-y-2 list-disc list-inside text-gray-700">{children}</ul>
                 ),
                 ol: ({ children }) => (
-                  <ol className="mb-6 space-y-3">{children}</ol>
+                  <ol className="mb-6 space-y-2 list-decimal list-inside text-gray-700">{children}</ol>
                 ),
                 li: ({ children }) => (
-                  <li className="text-slate-600 flex items-start">
-                    <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mt-3 mr-4 flex-shrink-0"></span>
-                    <span className="leading-relaxed">{children}</span>
-                  </li>
+                  <li className="text-gray-700 leading-relaxed">{children}</li>
                 ),
                 code: ({ children, className }) => {
                   const isInline = !className;
                   if (isInline) {
                     return (
-                      <code className="bg-gradient-to-r from-blue-50 to-purple-50 px-3 py-1.5 rounded-lg text-sm font-mono text-purple-700 border border-purple-100">
+                      <code className="bg-blue-50 px-2 py-1 rounded text-sm font-mono text-blue-700 border border-blue-100">
                         {children}
                       </code>
                     );
                   }
                   return (
-                    <div className="mb-6 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                      <div className="bg-gradient-to-r from-slate-700 to-slate-800 px-4 py-3 flex items-center">
-                        <div className="flex space-x-2">
-                          <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                          <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                          <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                        </div>
-                      </div>
-                      <pre className="bg-slate-900 text-slate-100 p-6 overflow-x-auto">
-                        <code className="font-mono text-sm leading-relaxed">{children}</code>
-                      </pre>
-                    </div>
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto mb-6 border">
+                      <code className="font-mono text-sm">{children}</code>
+                    </pre>
                   );
                 },
                 table: ({ children }) => (
-                  <div className="my-8 overflow-hidden rounded-xl border border-slate-200 shadow-lg bg-white">
+                  <div className="my-8 overflow-hidden rounded-lg border border-gray-200">
                     <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-slate-200">
+                      <table className="min-w-full">
                         {children}
                       </table>
                     </div>
                   </div>
                 ),
                 thead: ({ children }) => (
-                  <thead className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50">
+                  <thead className="bg-blue-50">
                     {children}
                   </thead>
                 ),
                 tbody: ({ children }) => (
-                  <tbody className="bg-white divide-y divide-slate-100">
+                  <tbody className="bg-white">
                     {children}
                   </tbody>
                 ),
                 tr: ({ children }) => (
-                  <tr className="hover:bg-gradient-to-r hover:from-blue-25 hover:to-purple-25 transition-all duration-200">
+                  <tr className="border-b border-gray-100 hover:bg-gray-50">
                     {children}
                   </tr>
                 ),
                 th: ({ children }) => (
-                  <th className="px-6 py-4 text-left text-sm font-bold text-slate-700 uppercase tracking-wider border-b-2 border-slate-200">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-blue-700 border-b border-gray-200">
                     {children}
                   </th>
                 ),
                 td: ({ children }) => (
-                  <td className="px-6 py-4 text-sm text-slate-600 whitespace-nowrap border-b border-slate-100">
+                  <td className="px-6 py-4 text-sm text-gray-700">
                     {children}
                   </td>
                 ),
                 blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-blue-400 pl-6 py-4 my-6 italic text-slate-600 bg-gradient-to-r from-blue-50/50 to-purple-50/50 rounded-r-lg">
+                  <blockquote className="border-l-4 border-blue-500 pl-6 py-3 my-6 bg-blue-50 text-gray-700">
                     {children}
                   </blockquote>
                 ),
                 a: ({ children, href }) => (
                   <a 
                     href={href} 
-                    className="text-blue-600 hover:text-purple-600 underline decoration-2 underline-offset-2 transition-colors duration-200 font-medium"
+                    className="text-blue-600 hover:text-blue-800 underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -118,7 +105,7 @@ export default function Home() {
                   </a>
                 ),
                 strong: ({ children }) => (
-                  <strong className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  <strong className="font-semibold text-blue-600">
                     {children}
                   </strong>
                 ),
@@ -127,13 +114,6 @@ export default function Home() {
               {content}
             </Markdown>
           </div>
-        </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-xl"></div>
-          <div className="absolute top-40 right-10 w-24 h-24 bg-purple-200/20 rounded-full blur-xl"></div>
-          <div className="absolute bottom-20 left-1/4 w-28 h-28 bg-indigo-200/20 rounded-full blur-xl"></div>
         </div>
       </main>
     </div>

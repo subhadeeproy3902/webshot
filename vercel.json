@@ -11,6 +11,10 @@
       "dest": "/api/screenshot.js"
     },
     {
+      "src": "/test",
+      "dest": "/api/test.js"
+    },
+    {
       "src": "/",
       "dest": "/api/index.js"
     }

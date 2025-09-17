@@ -51,11 +51,9 @@ app.get('/screenshot', async (req, res) => {
     }
 
     console.log(`Taking screenshot of: ${url}`);
-    console.log(`Environment: ${process.env.VERCEL ? 'Vercel' : 'Local'}`);
-    console.log(`Platform: ${process.platform}`);
 
-    // Check if running locally or in production (Vercel sets VERCEL env var)
-    const isLocal = !process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME;
+    // Check if running locally or in production
+    const isLocal = process.platform === 'win32' || process.platform === 'darwin' || process.platform === 'linux';
 
     let executablePath;
     let args;
@@ -91,14 +89,10 @@ app.get('/screenshot', async (req, res) => {
       ];
     } else {
       // For production/serverless
-      try {
-        executablePath = await chromium.executablePath();
-        args = chromium.args;
-        console.log(`Chromium executable path: ${executablePath}`);
-      } catch (chromiumError) {
-        console.error('Failed to get Chromium executable path:', chromiumError);
-        throw new Error(`Chromium setup failed: ${chromiumError.message}`);
-      }
+      executablePath = await chromium.executablePath(
+        `https://github.com/Sparticuz/chromium/releases/download/v130.0.0/chromium-v130.0.0-pack.tar`,
+      );
+      args = chromium.args;
     }
 
     // Launch Puppeteer browser
@@ -200,25 +194,20 @@ app.use((req, res) => {
   });
 });
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Webshot API server is running on port ${PORT}`);
-    console.log(`Health check: http://localhost:${PORT}/`);
-    console.log(`Screenshot API: http://localhost:${PORT}/screenshot?url=<URL>`);
-  });
+// Start server
+app.listen(PORT, () => {
+  console.log(`Webshot API server is running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/`);
+  console.log(`Screenshot API: http://localhost:${PORT}/screenshot?url=<URL>`);
+});
 
-  // Graceful shutdown
-  process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
-    process.exit(0);
-  });
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
 
-  process.on('SIGINT', () => {
-    console.log('SIGINT received, shutting down gracefully');
-    process.exit(0);
-  });
-}
-
-// Export for Vercel
-module.exports = app;
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  process.exit(0);
+});

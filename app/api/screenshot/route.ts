@@ -5,11 +5,21 @@ import { NextRequest, NextResponse } from "next/server";
 const screenshotCache = new Map<string, { data: Buffer; timestamp: number }>();
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
+// CORS headers
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Accept, Cache-Control",
+};
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const urlParam = searchParams.get("url");
   if (!urlParam) {
-    return new NextResponse("Please provide a URL.", { status: 400 });
+    return new NextResponse("Please provide a URL.", {
+      status: 400,
+      headers: corsHeaders,
+    });
   }
 
   // Prepend http:// if missing
@@ -25,10 +35,14 @@ export async function GET(request: NextRequest) {
     if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
       return new NextResponse("URL must start with http:// or https://", {
         status: 400,
+        headers: corsHeaders,
       });
     }
   } catch {
-    return new NextResponse("Invalid URL provided.", { status: 400 });
+    return new NextResponse("Invalid URL provided.", {
+      status: 400,
+      headers: corsHeaders,
+    });
   }
 
   // Check cache first
@@ -36,6 +50,7 @@ export async function GET(request: NextRequest) {
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return new NextResponse(cached.data as BodyInit, {
       headers: {
+        ...corsHeaders,
         "Content-Type": "image/png",
         "Content-Disposition": 'inline; filename="screenshot.png"',
         "Cache-Control": "public, max-age=86400",
@@ -43,8 +58,6 @@ export async function GET(request: NextRequest) {
       },
     });
   }
-
-
 
   let browser;
   try {
@@ -76,29 +89,34 @@ export async function GET(request: NextRequest) {
     const page = await browser.newPage();
 
     // Optimize for faster loading
-    await page.setViewport({ width: 1200, height: 800 });
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+      deviceScaleFactor: 1,
+    });
 
     // Navigate with faster settings
     await page.goto(parsedUrl.toString(), {
       waitUntil: "domcontentloaded", // Faster than networkidle2
-      timeout: 30000
+      timeout: 30000,
     });
 
     // Wait a bit for content to load
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const screenshot = await page.screenshot({
-      type: "png"
+      type: "png",
     });
 
     // Cache the screenshot
     screenshotCache.set(inputUrl, {
       data: screenshot as Buffer,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     return new NextResponse(screenshot, {
       headers: {
+        ...corsHeaders,
         "Content-Type": "image/png",
         "Content-Disposition": 'inline; filename="screenshot.png"',
         "Cache-Control": "public, max-age=86400",
@@ -109,11 +127,22 @@ export async function GET(request: NextRequest) {
     console.error(error);
     return new NextResponse(
       "An error occurred while generating the screenshot.",
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   } finally {
     if (browser) {
       await browser.close();
     }
   }
+}
+
+// Handle preflight requests
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
 }

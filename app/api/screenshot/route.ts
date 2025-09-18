@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Simple in-memory cache
 const screenshotCache = new Map<string, { data: Buffer; timestamp: number }>();
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
 // CORS headers
 const corsHeaders = {
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
         ...corsHeaders,
         "Content-Type": "image/png",
         "Content-Disposition": 'inline; filename="screenshot.png"',
-        "Cache-Control": "public, max-age=86400",
+        "Cache-Control": "public, max-age=3600",
         "X-Cache": "HIT",
       },
     });
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
         ...corsHeaders,
         "Content-Type": "image/png",
         "Content-Disposition": 'inline; filename="screenshot.png"',
-        "Cache-Control": "public, max-age=86400",
+        "Cache-Control": "public, max-age=3600",
         "X-Cache": "MISS",
       },
     });

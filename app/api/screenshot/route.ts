@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import { screenshotCache } from "../../../lib/cache";
+
+// Simple in-memory cache
+const screenshotCache = new Map<string, { data: Buffer; timestamp: number }>();
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -29,17 +32,19 @@ export async function GET(request: NextRequest) {
   }
 
   // Check cache first
-  const cachedScreenshot = await screenshotCache.get(inputUrl);
-  if (cachedScreenshot) {
-    return new NextResponse(cachedScreenshot as BodyInit, {
+  const cached = screenshotCache.get(inputUrl);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return new NextResponse(cached.data as BodyInit, {
       headers: {
         "Content-Type": "image/png",
         "Content-Disposition": 'inline; filename="screenshot.png"',
-        "Cache-Control": "public, max-age=86400", // 24 hours
+        "Cache-Control": "public, max-age=86400",
         "X-Cache": "HIT",
       },
     });
   }
+
+
 
   let browser;
   try {
@@ -70,44 +75,33 @@ export async function GET(request: NextRequest) {
     browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
 
-    // Optimize page loading for faster screenshots
-    await page.setViewport({ width: 1920, height: 1080 });
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    // Optimize for faster loading
+    await page.setViewport({ width: 1200, height: 800 });
 
-    // Block unnecessary resources for faster loading
-    await page.setRequestInterception(true);
-    page.on('request', (req: any) => {
-      const resourceType = req.resourceType();
-      if (['font', 'media', 'other'].includes(resourceType)) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
-
-    // Navigate with optimized settings
+    // Navigate with faster settings
     await page.goto(parsedUrl.toString(), {
       waitUntil: "domcontentloaded", // Faster than networkidle2
-      timeout: 15000 // 15 second timeout
+      timeout: 30000
     });
 
-    // Wait a bit for dynamic content to load
-    await page.waitForTimeout(2000);
+    // Wait a bit for content to load
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const screenshot = await page.screenshot({
-      type: "png",
-      quality: 80, // Optimize file size
-      fullPage: false // Only capture viewport for speed
+      type: "png"
     });
 
     // Cache the screenshot
-    await screenshotCache.set(inputUrl, screenshot as Buffer);
+    screenshotCache.set(inputUrl, {
+      data: screenshot as Buffer,
+      timestamp: Date.now()
+    });
 
-    return new NextResponse(screenshot as BodyInit, {
+    return new NextResponse(screenshot, {
       headers: {
         "Content-Type": "image/png",
         "Content-Disposition": 'inline; filename="screenshot.png"',
-        "Cache-Control": "public, max-age=86400", // 24 hours
+        "Cache-Control": "public, max-age=86400",
         "X-Cache": "MISS",
       },
     });

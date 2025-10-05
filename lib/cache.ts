@@ -15,7 +15,7 @@ class ScreenshotCache {
 
   constructor() {
     this.cacheDir = path.join(process.cwd(), '.cache', 'screenshots');
-    this.maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    this.maxAge = 7 * 24 * 60 * 60 * 1000; // 1 week
     this.memoryCache = new Map();
     this.ensureCacheDir();
   }
